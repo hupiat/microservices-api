@@ -5,12 +5,19 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
-      - DB_HOST=mysql
-      - DB_DATABASE=mydb
-      - DB_USERNAME=root
-      - DB_PASSWORD=root
+      DB_HOST: mysql
+      DB_DATABASE: mydb
+      DB_USERNAME: root
+      DB_PASSWORD: root
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "mysql"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
   node-api:
     build: ./backend/node-api
