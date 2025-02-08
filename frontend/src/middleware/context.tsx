@@ -3,15 +3,11 @@ import { useContext } from "react";
 import { Account, ContextChildren } from "../types";
 import DataStore from "./DataStore";
 import { API_ACCOUNTS, API_PREFIX } from "./paths";
-import { useStoreDataAccounts } from "./hooks";
 
 interface IMiddlewareContext {
   user: Account | null;
   setUser: (user: Account | null) => Promise<void>;
   setUserState: Dispatch<SetStateAction<Account | null>>;
-  // Note this datastore should always be fetched from context for
-  // performances concern
-  storeDataAccounts: DataStore<Account>;
 }
 
 const SetupMiddlewareContext = React.createContext<
@@ -24,9 +20,6 @@ interface IProps {
 
 const MiddlewareContext = ({ children }: IProps) => {
   const [user, setUserState] = useState<Account | null>(null);
-
-  // Init data stores static logs
-  const [, storeDataAccounts] = useStoreDataAccounts();
 
   // State reducer (login + logout)
   const setUser = async (user: Account | null): Promise<void> => {
@@ -67,7 +60,6 @@ const MiddlewareContext = ({ children }: IProps) => {
         user,
         setUser,
         setUserState,
-        storeDataAccounts,
       }}
     >
       {children}

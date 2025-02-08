@@ -13,7 +13,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class, // Update if your model is different
+            'model' => App\Models\User::class,
         ],
     ],
 ];
