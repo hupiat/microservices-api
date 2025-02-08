@@ -38,18 +38,27 @@ jobs:
           cp .env.example .env
           php artisan cache:clear
 
-      - name: Wait for MySQL (longer timeout)
+      - name: Vérifier si le conteneur MySQL tourne
         run: |
-          MYSQL_IP=$(grep DB_HOST backend/lumen-api/.env | cut -d '=' -f2)
+          MYSQL_CONTAINER_ID=$(docker ps -q --filter "ancestor=mysql:8")
+          if [ -z "$MYSQL_CONTAINER_ID" ]; then
+            echo "❌ Aucun conteneur MySQL trouvé. Vérifie que MySQL est bien démarré."
+            exit 1
+          else
+            echo "✅ MySQL est démarré avec l'ID : $MYSQL_CONTAINER_ID"
+          fi
+
+      - name: Attendre que MySQL soit prêt
+        run: |
           for i in {1..20}; do
-            if mysqladmin ping -h"$MYSQL_IP" -uroot -proot --silent; then
-              echo "MySQL is ready!"
+            if mysqladmin ping -h127.0.0.1 -uroot -proot --silent; then
+              echo "✅ MySQL est prêt !"
               exit 0
             fi
-            echo "Waiting for MySQL... Attempt $i"
+            echo "⏳ MySQL n'est pas encore prêt... Tentative $i"
             sleep 5
           done
-          echo "MySQL did not start in time."
+          echo "❌ MySQL ne répond pas après plusieurs tentatives."
           exit 1
 
       - name: Run Lumen migrations
