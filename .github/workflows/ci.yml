@@ -25,9 +25,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Update Composer
-        run: composer self-update --update-keys
-
       - name: Disable Composer Secure Signatures
         run: composer config --global --unset signature
 
