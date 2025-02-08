@@ -14,8 +14,8 @@ This project is a **Node.js API** that interacts with a **Lumen backend** for us
 ### 2️⃣ Clone the Project
 
 ```sh
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+git clone https://github.com/hupiat/microservices-api.git
+cd microservices-api
 ```
 
 ### 3️⃣ Install Dependencies
