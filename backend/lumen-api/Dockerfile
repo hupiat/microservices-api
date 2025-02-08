@@ -2,7 +2,7 @@
 FROM php:8.2-fpm
 
 # Set working directory
-WORKDIR /var/www
+WORKDIR /var/www/html
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
