@@ -18,30 +18,18 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: mydb
-          MYSQL_USER: test
-          MYSQL_PASSWORD: test
         ports:
           - "3306:3306"
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Update Composer
-        run: composer self-update
+        run: composer self-update --update-keys
 
-      - name: Cache Composer Dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.composer/cache/files
-          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            composer-${{ runner.os }}-
+      - name: Disable Composer Secure Signatures
+        run: composer config --global --unset signature
 
       - name: Setup PHP & Composer
         uses: shivammathur/setup-php@v2
@@ -50,36 +38,12 @@ jobs:
           extensions: pdo, pdo_mysql
           tools: composer
 
-      - name: Debug Composer
-        run: |
-          cd backend/lumen-api
-          composer diagnose
-
       - name: Install Lumen dependencies
         run: |
           cd backend/lumen-api
-          composer install --no-interaction --prefer-dist --no-scripts
+          composer install --no-interaction --prefer-dist --no-plugins --no-scripts
           cp .env.example .env
           php artisan cache:clear
-          php artisan config:clear
-
-      - name: Vérification du fichier .env
-        run: |
-          cd backend/lumen-api
-          cat .env
-
-      - name: Run Composer Post Install Scripts
-        run: |
-          cd backend/lumen-api
-          composer run-script post-install-cmd || echo "No post-install scripts"
-
-      - name: Wait for MySQL
-        run: |
-          echo "Waiting for MySQL to be ready..."
-          until mysqladmin ping -h"127.0.0.1" -uroot -proot --silent; do
-            sleep 2
-          done
-          echo "MySQL is up!"
 
       - name: Run Lumen migrations
         run: |
@@ -89,4 +53,4 @@ jobs:
       - name: Run Lumen tests
         run: |
           cd backend/lumen-api
-          vendor/bin/phpunit --testdox
+          vendor/bin/phpunit
