@@ -18,8 +18,16 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: mydb
+          MYSQL_USER: test
+          MYSQL_PASSWORD: test
         ports:
           - "3306:3306"
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -34,24 +42,25 @@ jobs:
       - name: Install Lumen dependencies
         run: |
           cd backend/lumen-api
-          composer install
+          composer install --no-interaction --prefer-dist --optimize-autoloader
           cp .env.example .env
           php artisan cache:clear
+          php artisan config:clear
 
       - name: Wait for MySQL
         run: |
-          until mysqladmin ping -h"127.0.0.1" --silent; do
-            echo "Waiting for database..."
+          echo "Waiting for MySQL to be ready..."
+          until mysqladmin ping -h"127.0.0.1" -uroot -proot --silent; do
             sleep 2
           done
+          echo "MySQL is up!"
 
       - name: Run Lumen migrations
         run: |
           cd backend/lumen-api
-          chmod +x artisan
           php artisan migrate --env=testing --force
 
       - name: Run Lumen tests
         run: |
           cd backend/lumen-api
-          vendor/bin/phpunit
+          vendor/bin/phpunit --testdox
