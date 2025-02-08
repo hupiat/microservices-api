@@ -19,7 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
 // POST - Login
 app.post(
-  "api/users/login",
+  "/api/users/login",
   async (req: Request, res: Response): Promise<any> => {
     try {
       const { email, password } = req.body;
@@ -49,7 +49,7 @@ app.post(
 
 // POST - Logout
 app.post(
-  "api/users/logout",
+  "/api/users/logout",
   async (req: Request, res: Response): Promise<any> => {
     try {
       const token = req.headers.authorization?.split(" ")[1];
@@ -105,7 +105,7 @@ const authenticate = async (
 // GET ALL
 
 app.get(
-  "api/users",
+  "/api/users",
   authenticate,
   async (req: Request, res: Response): Promise<any> => {
     try {
@@ -130,7 +130,7 @@ app.get(
 // GET BY ID
 
 app.get(
-  "api/users/:id",
+  "/api/users/:id",
   authenticate,
   async (req: Request, res: Response): Promise<any> => {
     try {
@@ -158,7 +158,7 @@ app.get(
 
 // POST
 
-app.post("api/users", async (req: Request, res: Response) => {
+app.post("/api/users", async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
     const response = await fetch(`${LUMEN_API_URL}/register`, {
@@ -181,7 +181,7 @@ app.post("api/users", async (req: Request, res: Response) => {
 
 // PUT
 
-app.put("api/users/:id", authenticate, async (req: Request, res: Response) => {
+app.put("/api/users/:id", authenticate, async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
     const { name, email, password } = req.body;
@@ -208,7 +208,7 @@ app.put("api/users/:id", authenticate, async (req: Request, res: Response) => {
 // DELETE
 
 app.delete(
-  "api/users/:id",
+  "/api/users/:id",
   authenticate,
   async (req: Request, res: Response) => {
     try {

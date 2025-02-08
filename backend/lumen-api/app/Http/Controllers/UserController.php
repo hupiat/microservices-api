@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Laravel\Lumen\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends BaseController
 {
@@ -34,7 +35,7 @@ class UserController extends BaseController
     {
         $credentials = $request->only('email', 'password');
 
-        if (!$token = JWTAuth::attempt($credentials)) {
+        if (!$token = Auth::guard('jwt')->attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
