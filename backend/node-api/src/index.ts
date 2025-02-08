@@ -76,10 +76,6 @@ app.post("/users", async (req: Request, res: Response) => {
     });
     await redis.del("users");
 
-    console.log(await response.text());
-    const contentType = response.headers.get("content-type");
-    console.log("🔍 Content-Type:", contentType);
-
     res.status(201).json((await response.json()).user);
   } catch (error) {
     console.error("Error while creating user", error);
