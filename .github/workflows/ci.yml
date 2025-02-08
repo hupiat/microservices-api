@@ -45,6 +45,7 @@ jobs:
       - name: Run Lumen migrations
         run: |
           cd backend/lumen-api
+          sleep 10
           php artisan migrate --env=testing --force
 
       - name: Run Lumen tests
