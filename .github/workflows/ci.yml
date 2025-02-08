@@ -32,13 +32,13 @@ jobs:
 
       - name: Install Lumen dependencies
         run: |
-          cd lumen
+          cd backend/lumen-api
           composer install
+          php artisan migrate --env=testing
 
       - name: Run Lumen tests
         run: |
-          cd lumen
-          php artisan migrate --env=testing
+          cd backend/lumen-api
           vendor/bin/phpunit
 
   node-tests:
@@ -59,12 +59,12 @@ jobs:
 
       - name: Install Node.js dependencies
         run: |
-          cd node
+          cd backend/node-api
           npm install
 
       - name: Run Jest tests
         run: |
-          cd node
+          cd backend/node-api
           npm test
 
   docker-build:
