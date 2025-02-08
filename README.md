@@ -100,6 +100,10 @@ npm install --save-dev jest supertest
 ### 2️⃣ Run Tests
 
 ```sh
+composer test
+```
+
+```sh
 npm test
 ```
 
