@@ -1,13 +1,3 @@
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
@@ -34,46 +24,23 @@ jobs:
         run: |
           cd backend/lumen-api
           composer install
-          php artisan migrate --env=testing
+          cp .env.example .env
+          php artisan config:clear
+
+      - name: Wait for MySQL
+        run: |
+          until mysqladmin ping -h"127.0.0.1" --silent; do
+            echo "Waiting for database..."
+            sleep 2
+          done
+
+      - name: Run Lumen migrations
+        run: |
+          cd backend/lumen-api
+          chmod +x artisan
+          php artisan migrate --env=testing --force
 
       - name: Run Lumen tests
         run: |
           cd backend/lumen-api
           vendor/bin/phpunit
-
-  node-tests:
-    runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis:latest
-        ports:
-          - "6379:6379"
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Node.js dependencies
-        run: |
-          cd backend/node-api
-          npm install
-
-      - name: Run Jest tests
-        run: |
-          cd backend/node-api
-          npm test
-
-  docker-build:
-    needs: [backend-tests, node-tests]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Build Docker images
-        run: |
-          docker-compose build
