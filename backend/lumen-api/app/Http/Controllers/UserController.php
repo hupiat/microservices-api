@@ -20,7 +20,7 @@ class UserController extends BaseController
         } else {
             return response()->json(['error' => 'Invalid JSON format'], 400);
         }
-        $validator = $this->validateRequest($request);
+        $validator = $this->validateRequest($request, null);
 
         $user = User::create([
             'name' => $request->input('name'),
@@ -71,7 +71,7 @@ class UserController extends BaseController
         $user = User::find($id);
         if (!$user) return response()->json(['error' => 'User not found'], 404);
 
-        $validator = $this->validateRequest($request);
+        $validator = $this->validateRequest($request, $id);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 422);
@@ -90,13 +90,19 @@ class UserController extends BaseController
         return response()->json($user);
     }
 
-    private function validateRequest($request)
+    private function validateRequest($request, $userId)
     {
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6'
-        ]);
-        return $validator;
+            'email' => 'required|email|unique:users,email,' . $userId,
+        ];
+    
+        if (!$userId) {
+            $rules['password'] = 'required|min:6';
+        } else {
+            $rules['password'] = 'nullable|min:6';
+        }
+    
+        return Validator::make($request->all(), $rules);
     }
 }

@@ -117,14 +117,15 @@ export default class DataStore<T extends BusinessObject> {
 
   // Loads from server
 
-  async fetchAll(longitude?: number, latitude?: number): Promise<void> {
+  async fetchAll(): Promise<void> {
     await DataStore.doFetch(this.url!, async (url) => {
-      if (longitude && latitude) {
-        url = url + `/${longitude}/${latitude}`;
-      }
       this.data?.clear(); // Better cleaning up for js engine
       this.data = undefined;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       this.data = new Set(await res.json());
       this.notify();
       return res;
@@ -133,7 +134,11 @@ export default class DataStore<T extends BusinessObject> {
 
   async fetchById(id: number): Promise<void> {
     await DataStore.doFetch(this.url! + "/" + id, async (url) => {
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
       const obj = await res.json();
       if (this.data) {
         const other = this.getById(id);
@@ -169,6 +174,7 @@ export default class DataStore<T extends BusinessObject> {
         body: JSON.stringify(obj),
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       const json = await res!.json();
@@ -183,12 +189,13 @@ export default class DataStore<T extends BusinessObject> {
 
   async update(obj: T): Promise<void> {
     this.checkForSyncBeforeProcessing();
-    await DataStore.doFetch(this.url!, async (url) => {
+    await DataStore.doFetch(this.url! + "/" + obj.id, async (url) => {
       const res = await fetch(url, {
         method: "PUT",
         body: JSON.stringify(obj),
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       obj = await res.json();
@@ -209,6 +216,9 @@ export default class DataStore<T extends BusinessObject> {
     await DataStore.doFetch(this.url! + "/" + id, async (url) => {
       const res = await fetch(url, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       const local = this.getById(id);
       ok = res.ok;

@@ -8,11 +8,7 @@ export const validateEmail = (email: string): boolean => {
 
 export const validatePassword = (pw: string): boolean => {
   return (
-    /[A-Z]/.test(pw) &&
-    /[a-z]/.test(pw) &&
-    /[0-9]/.test(pw) &&
-    /[^A-Za-z0-9]/.test(pw) &&
-    pw.length > 8
+    /[A-Z]/.test(pw) && /[a-z]/.test(pw) && /[0-9]/.test(pw) && pw.length > 5
   );
 };
 

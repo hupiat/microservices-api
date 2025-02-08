@@ -27,8 +27,12 @@ const MiddlewareContext = ({ children }: IProps) => {
       await DataStore.doFetch(`${API_PREFIX}/${API_ACCOUNTS}/logout`, (url) =>
         fetch(url, {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         })
       );
+      localStorage.clear();
       setUserState(null);
     } else {
       const res = await DataStore.doFetch(
@@ -49,7 +53,8 @@ const MiddlewareContext = ({ children }: IProps) => {
         throw Error("Bad credentials");
       } else {
         const json = await res!.json();
-        setUserState(json);
+        localStorage.setItem("token", json.token);
+        setUserState(user);
       }
     }
   };

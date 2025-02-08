@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import DataStore from "./DataStore";
 import { Account, BusinessObject, WorkflowStep } from "../types";
-import { API_ACCOUNTS, API_PREFIX } from "./paths";
+import { API_ACCOUNTS, API_PREFIX, PATH_LOGIN } from "./paths";
+import { useMiddlewareContext } from "./context";
+import { useNavigate } from "react-router-dom";
 
 export type StoreSnapshot<T extends BusinessObject> = [
   Array<T> | null,
@@ -98,4 +100,15 @@ const useStoreDataCreate = <T extends BusinessObject>(
 // Business
 
 export const useStoreDataAccounts = (): StoreSnapshot<Account> =>
-  useStoreDataCreate<Account>(API_ACCOUNTS, false);
+  useStoreDataCreate<Account>(API_ACCOUNTS);
+
+// Utils
+
+export const useRedirectToLogin = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate(PATH_LOGIN);
+    }
+  }, []);
+};

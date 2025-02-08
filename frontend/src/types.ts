@@ -17,7 +17,8 @@ export type WorkflowStep = "read" | "add" | "edit" | "delete";
 
 export interface BusinessObject {
   id: number;
-  created_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface Account extends BusinessObject {

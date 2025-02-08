@@ -34,40 +34,14 @@ app.post(
         return res.status(response.status).json(await response.json());
       }
 
-      const data = await response.json();
       const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
 
       await redis.set(`session:${email}`, token, "EX", CACHE_TIME_SECONDS);
 
-      res.json({ token, user: data.user });
+      res.json({ token });
     } catch (error) {
       console.error("Error while logging in", error);
       res.status(500).json({ error: "Error while logging in." });
-    }
-  }
-);
-
-// POST - Logout
-app.post(
-  "/api/users/logout",
-  async (req: Request, res: Response): Promise<any> => {
-    try {
-      const token = req.headers.authorization?.split(" ")[1];
-
-      if (!token) {
-        return res.status(401).json({ error: "Unauthorized" });
-      }
-
-      const decoded: any = jwt.verify(token, JWT_SECRET);
-
-      if (decoded.email) {
-        await redis.del(`session:${decoded.email}`);
-      }
-
-      res.json({ message: "Logged out successfully" });
-    } catch (error) {
-      console.error("Error while logging out", error);
-      res.status(500).json({ error: "Error while logging out." });
     }
   }
 );
@@ -102,6 +76,32 @@ const authenticate = async (
   }
 };
 
+// DELETE - Logout
+app.delete(
+  "/api/users/logout",
+  authenticate,
+  async (req: Request, res: Response): Promise<any> => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+
+      if (!token) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const decoded: any = jwt.verify(token, JWT_SECRET);
+
+      if (decoded.email) {
+        await redis.del(`session:${decoded.email}`);
+      }
+
+      res.json({ message: "Logged out successfully" });
+    } catch (error) {
+      console.error("Error while logging out", error);
+      res.status(500).json({ error: "Error while logging out." });
+    }
+  }
+);
+
 // GET ALL
 
 app.get(
@@ -113,7 +113,10 @@ app.get(
       if (cachedUsers) return res.json(JSON.parse(cachedUsers));
 
       const response = await fetch(`${LUMEN_API_URL}/users`, {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${req.headers.authorization}`,
+        },
       });
 
       const data = await response.json();
@@ -139,16 +142,19 @@ app.get(
       if (cachedUser) return res.json(JSON.parse(cachedUser));
 
       const response = await fetch(`${LUMEN_API_URL}/users/${userId}`, {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${req.headers.authorization}`,
+        },
       });
-      const data = (await response.json()).user;
+      const data = await response.json();
       await redis.setex(
         `user:${userId}`,
         CACHE_TIME_SECONDS,
-        JSON.stringify(data.user)
+        JSON.stringify(data)
       );
 
-      res.json(data.user);
+      res.json(data);
     } catch (error) {
       console.error("Error while getting user", error);
       res.status(404).json({ error: "Could not find user." });
@@ -168,11 +174,14 @@ app.post("/api/users", async (req: Request, res: Response) => {
         email,
         password,
       }),
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${req.headers.authorization}`,
+      },
     });
     await redis.del("users");
 
-    res.status(201).json((await response.json()).user);
+    res.status(201).json(await response.json());
   } catch (error) {
     console.error("Error while creating user", error);
     res.status(400).json({ error: "Error while creating user." });
@@ -192,13 +201,16 @@ app.put("/api/users/:id", authenticate, async (req: Request, res: Response) => {
         email,
         password,
       }),
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${req.headers.authorization}`,
+      },
     });
 
     await redis.del("users");
     await redis.del(`user:${userId}`);
 
-    res.json((await response.json()).user);
+    res.json(await response.json());
   } catch (error) {
     console.error("Error while updating user", error);
     res.status(400).json({ error: "Error while updating user." });
@@ -215,13 +227,16 @@ app.delete(
       const userId = req.params.id;
       const response = await fetch(`${LUMEN_API_URL}/users/${userId}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${req.headers.authorization}`,
+        },
       });
 
       await redis.del("users");
       await redis.del(`user:${userId}`);
 
-      res.json((await response.json()).user);
+      res.json(await response.json());
     } catch (error) {
       console.error("Error while deleting user", error);
       res.status(400).json({ error: "Error while deleting user." });
