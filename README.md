@@ -68,6 +68,14 @@ php artisan migrate:refresh --seed
 
 ---
 
+## 🔄 Starting client
+
+To start the client, navigate to its directory:
+
+```sh
+npm start
+```
+
 ## 📋 API Endpoints
 
 ### 🔐 Authentication
