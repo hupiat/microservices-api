@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import Redis from "ioredis";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 
 const CACHE_TIME_SECONDS = 3600;
 
@@ -244,5 +243,9 @@ app.delete(
   }
 );
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Node API running on port ${PORT}`));
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`🚀 Node API running on port ${PORT}`));
+}
+
+export default app;
