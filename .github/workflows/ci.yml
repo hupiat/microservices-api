@@ -1,0 +1,79 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: mydb
+        ports:
+          - "3306:3306"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup PHP & Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: pdo, pdo_mysql
+          tools: composer
+
+      - name: Install Lumen dependencies
+        run: |
+          cd lumen
+          composer install
+
+      - name: Run Lumen tests
+        run: |
+          cd lumen
+          php artisan migrate --env=testing
+          vendor/bin/phpunit
+
+  node-tests:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - "6379:6379"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Node.js dependencies
+        run: |
+          cd node
+          npm install
+
+      - name: Run Jest tests
+        run: |
+          cd node
+          npm test
+
+  docker-build:
+    needs: [backend-tests, node-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Build Docker images
+        run: |
+          docker-compose build
