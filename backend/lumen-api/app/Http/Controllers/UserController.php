@@ -19,11 +19,7 @@ class UserController extends BaseController
         } else {
             return response()->json(['error' => 'Invalid JSON format'], 400);
         }
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6'
-        ]);
+        $validator = $this->validateRequest($request);
 
         $user = User::create([
             'name' => $request->input('name'),
@@ -31,7 +27,7 @@ class UserController extends BaseController
             'password' => Hash::make($request->input('password'))
         ]);
 
-        return response()->json(['message' => 'User created', 'user' => $user], 201);
+        return response()->json($user, 201);
     }
 
     public function login(Request $request)
@@ -65,21 +61,23 @@ class UserController extends BaseController
 
     public function updateUser(Request $request, $id)
     {
+        $data = json_decode($request->getContent(), true);
+        if (is_array($data)) {
+            $request->merge($data);
+        } else {
+            return response()->json(['error' => 'Invalid JSON format'], 400);
+        }
         $user = User::find($id);
         if (!$user) return response()->json(['error' => 'User not found'], 404);
 
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string',
-            'email' => 'sometimes|required|email|unique:users,email,' . $id,
-            'password' => 'sometimes|required|min:6'
-        ]);
+        $validator = $this->validateRequest($request);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors()], 422);
         }
 
         $user->update($request->all());
-        return response()->json(['message' => 'User updated', 'user' => $user]);
+        return response()->json($user);
     }
 
     public function deleteUser($id)
@@ -88,6 +86,16 @@ class UserController extends BaseController
         if (!$user) return response()->json(['error' => 'User not found'], 404);
 
         $user->delete();
-        return response()->json(['message' => 'User deleted']);
+        return response()->json($user);
+    }
+
+    private function validateRequest($request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6'
+        ]);
+        return $validator;
     }
 }

@@ -14,12 +14,17 @@ app.use(express.json());
 const redis = new Redis();
 const LUMEN_API_URL = process.env.LUMEN_API_URL || "http://localhost:8000";
 
+// GET ALL
+
 app.get("/users", async (req: Request, res: Response): Promise<any> => {
   try {
     const cachedUsers = await redis.get("users");
     if (cachedUsers) return res.json(JSON.parse(cachedUsers));
 
-    const response = await fetch(`${LUMEN_API_URL}/users`);
+    const response = await fetch(`${LUMEN_API_URL}/users`, {
+      headers: { "Content-Type": "application/json" },
+    });
+
     const data = await response.json();
     await redis.setex("users", CACHE_TIME_SECONDS, JSON.stringify(data));
 
@@ -30,26 +35,32 @@ app.get("/users", async (req: Request, res: Response): Promise<any> => {
   }
 });
 
+// GET BY ID
+
 app.get("/users/:id", async (req: Request, res: Response): Promise<any> => {
   try {
     const userId = req.params.id;
     const cachedUser = await redis.get(`user:${userId}`);
     if (cachedUser) return res.json(JSON.parse(cachedUser));
 
-    const response = await fetch(`${LUMEN_API_URL}/users/${userId}`);
-    const data = await response.json();
+    const response = await fetch(`${LUMEN_API_URL}/users/${userId}`, {
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = (await response.json()).user;
     await redis.setex(
       `user:${userId}`,
       CACHE_TIME_SECONDS,
-      JSON.stringify(data)
+      JSON.stringify(data.user)
     );
 
-    res.json(data);
+    res.json(data.user);
   } catch (error) {
     console.error("Error while getting user", error);
     res.status(404).json({ error: "Could not find user." });
   }
 });
+
+// POST
 
 app.post("/users", async (req: Request, res: Response) => {
   try {
@@ -61,16 +72,22 @@ app.post("/users", async (req: Request, res: Response) => {
         email,
         password,
       }),
+      headers: { "Content-Type": "application/json" },
     });
-
     await redis.del("users");
 
-    res.status(201).json(await response.json());
+    console.log(await response.text());
+    const contentType = response.headers.get("content-type");
+    console.log("🔍 Content-Type:", contentType);
+
+    res.status(201).json((await response.json()).user);
   } catch (error) {
     console.error("Error while creating user", error);
     res.status(400).json({ error: "Error while creating user." });
   }
 });
+
+// PUT
 
 app.put("/users/:id", async (req: Request, res: Response) => {
   try {
@@ -83,29 +100,33 @@ app.put("/users/:id", async (req: Request, res: Response) => {
         email,
         password,
       }),
+      headers: { "Content-Type": "application/json" },
     });
 
     await redis.del("users");
     await redis.del(`user:${userId}`);
 
-    res.json(await response.json());
+    res.json((await response.json()).user);
   } catch (error) {
     console.error("Error while updating user", error);
     res.status(400).json({ error: "Error while updating user." });
   }
 });
 
+// DELETE
+
 app.delete("/users/:id", async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
     const response = await fetch(`${LUMEN_API_URL}/users/${userId}`, {
       method: "DELETE",
+      headers: { "Content-Type": "application/json" },
     });
 
     await redis.del("users");
     await redis.del(`user:${userId}`);
 
-    res.json(await response.json());
+    res.json((await response.json()).user);
   } catch (error) {
     console.error("Error while deleting user", error);
     res.status(400).json({ error: "Error while deleting user." });
