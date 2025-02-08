@@ -23,7 +23,7 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
+$app->withFacades();
 
 // $app->withEloquent();
 
@@ -115,8 +115,8 @@ $app->router->group([
 // Enable JWT
 
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
-$app->middleware([
-    App\Http\Middleware\Authenticate::class,
+$app->routeMiddleware([
+    'auth' => App\Http\Middleware\Authenticate::class,
 ]);
 
 return $app;

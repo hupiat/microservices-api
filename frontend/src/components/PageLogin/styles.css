@@ -1,0 +1,31 @@
+#card__login__container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 100px;
+}
+
+#card__login {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+#card__login > img {
+  width: 200px;
+  height: 200px;
+  border-radius: 20%;
+  margin: 25px;
+}
+
+.card__login__input {
+  margin-bottom: 25px !important;
+}
+
+#button__login__suscribe {
+  position: absolute;
+  bottom: 35px;
+  right: 50px;
+}

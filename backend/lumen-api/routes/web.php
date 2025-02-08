@@ -13,6 +13,11 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
-});
+$router->post('/login', 'UserController@login');
+$router->post('/logout', ['middleware' => 'auth', 'uses' => 'UserController@logout']);
+
+$router->get('/users', 'UserController@getUsers');
+$router->get('/users/{id}', 'UserController@getUser');
+$router->post('/register', 'UserController@register');
+$router->put('/users/{id}', 'UserController@updateUser');
+$router->delete('/users/{id}', 'UserController@deleteUser');
