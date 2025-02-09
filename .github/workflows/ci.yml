@@ -48,10 +48,10 @@ jobs:
         run: |
           for i in {1..20}; do
             if mysqladmin ping -h127.0.0.1 -uroot -proot --silent; then
-              echo "✅ MySQL is ready !"
+              echo "✅ MySQL is ready!"
               exit 0
             fi
-            echo "⏳ MySQL is not ready yet... Tentative $i"
+            echo "⏳ MySQL is not ready yet... Attempt $i"
             sleep 5
           done
           echo "❌ MySQL does not respond after many attempts."
@@ -68,6 +68,11 @@ jobs:
         run: |
           cd backend/lumen-api
           php artisan jwt:secret
+
+      - name: Start Lumen API in the background
+        run: |
+          cd backend/lumen-api
+          php -S 0.0.0.0:8000 -t public &
 
       - name: Run Lumen tests
         run: |
@@ -107,6 +112,19 @@ jobs:
             sleep 2
           done
           echo "❌ Redis did not start in time."
+          exit 1
+
+      - name: Wait for Lumen API
+        run: |
+          for i in {1..10}; do
+            if curl -sSf http://127.0.0.1:8000 > /dev/null; then
+              echo "✅ Lumen API is running!"
+              exit 0
+            fi
+            echo "⏳ Waiting for Lumen API..."
+            sleep 3
+          done
+          echo "❌ Lumen API did not start in time."
           exit 1
 
       - name: Run Node.js tests
