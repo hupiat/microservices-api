@@ -64,6 +64,11 @@ jobs:
           php artisan migrate
           php artisan db:seed
 
+      - name: Generate JWT Secret
+        run: |
+          cd backend/lumen-api
+          php artisan jwt:secret
+
       - name: Run Lumen tests
         run: |
           cd backend/lumen-api
