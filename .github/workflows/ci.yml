@@ -137,12 +137,3 @@ jobs:
         run: |
           cd backend/node-api
           npm test
-
-      - name: Debug Lumen API logs
-        if: failure()
-        run: |
-          echo "🚨 Lumen API logs:"
-          cat backend/lumen-api/storage/logs/lumen.log || echo "No logs found."
-
-          echo "🚨 PHP Error Logs:"
-          cat backend/lumen-api/lumen.log || echo "No PHP error logs found."

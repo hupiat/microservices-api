@@ -10,6 +10,7 @@ describe("User API", () => {
       email: "test@example.com",
       password: "Password123",
     });
+    console.log(res);
     expect(res.statusCode).toBe(201);
     expect(res.body.email).toBe("test@example.com");
   });
