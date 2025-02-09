@@ -7,11 +7,11 @@ describe("User API", () => {
   test("should register a user", async () => {
     const res = await request(app).post("/api/users").send({
       name: "Test User",
-      email: "test@example.fr",
+      email: "test@example.com",
       password: "Password123",
     });
     expect(res.statusCode).toBe(201);
-    expect(res.body.email).toBe("test@example.fr");
+    expect(res.body.email).toBe("test@example.com");
   });
 
   test("should login a user", async () => {
