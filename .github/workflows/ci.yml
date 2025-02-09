@@ -159,6 +159,18 @@ jobs:
           cd backend/lumen-api
           nohup php -S 127.0.0.1:8000 -t public > lumen.log 2>&1 &
 
+      - name: Run Lumen migrations
+        run: |
+          cd backend/lumen-api
+          chmod +x artisan
+          php artisan migrate
+          php artisan db:seed
+
+      - name: Generate JWT Secret
+        run: |
+          cd backend/lumen-api
+          php artisan jwt:secret
+
       - name: Run Node.js tests
         run: |
           cd backend/node-api
