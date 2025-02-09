@@ -48,13 +48,13 @@ jobs:
         run: |
           for i in {1..20}; do
             if mysqladmin ping -h127.0.0.1 -uroot -proot --silent; then
-              echo "✅ MySQL est prêt !"
+              echo "✅ MySQL is ready !"
               exit 0
             fi
-            echo "⏳ MySQL n'est pas encore prêt... Tentative $i"
+            echo "⏳ MySQL is not ready yet... Tentative $i"
             sleep 5
           done
-          echo "❌ MySQL ne répond pas après plusieurs tentatives."
+          echo "❌ MySQL does not respond after many attempts."
           exit 1
 
       - name: Run Lumen migrations
@@ -62,6 +62,11 @@ jobs:
           cd backend/lumen-api
           chmod +x artisan
           php artisan migrate --env=testing --force
+
+      - name: Afficher les logs de Lumen
+        run: |
+          echo "---- Lumen Error Log ----"
+          cat backend/lumen-api/storage/logs/lumen.log || echo "Aucun log trouvé"
 
       - name: Run Lumen tests
         run: |
