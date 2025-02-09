@@ -73,11 +73,8 @@ jobs:
         run: |
           cd backend/lumen-api
           vendor/bin/phpunit
-          
-      - name: Debug Login Request
+
+      - name: Debug Lumen Logs
         run: |
-          curl -X POST "http://127.0.0.1:8000/login" \
-         -H "Content-Type: application/json" \
-         --data '{"email": "test@example.com", "password": "Password123"}'
-
-
+          echo "=== Storage Logs ==="
+          cat backend/lumen-api/storage/logs/*.log || echo "No logs found"
