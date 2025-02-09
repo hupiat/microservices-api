@@ -111,8 +111,8 @@ jobs:
 
       - name: Set environment for GitHub Actions
         run: |
-          echo "LUMEN_API_URL=http://127.0.0.1:8000" >> backend/lumen-api/.env
-          echo "APP_ENV=ci" >> backend/lumen-api/.env
+          echo "LUMEN_API_URL=http://127.0.0.1:8000" >> backend/node-api/.env
+          echo "APP_ENV=ci" >> backend/node-api/.env
 
       - name: Start Lumen as a service
         run: |
