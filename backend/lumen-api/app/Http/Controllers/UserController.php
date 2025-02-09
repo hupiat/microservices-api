@@ -14,29 +14,24 @@ class UserController extends BaseController
 {
     public function register(Request $request)
     {
-        try {
-            $data = $request->all();
-            \Log::info("🔍 Data received for registration:", $data);
-    
-            $this->validate($request, [
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:6',
-            ]);
-    
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => app('hash')->make($data['password']),
-            ]);
-    
-            \Log::info("✅ User created successfully: ", $user->toArray());
-    
-            return response()->json($user, 201);
-        } catch (\Exception $e) {
-            \Log::error("❌ Error during user registration:", ['error' => $e->getMessage()]);
-            return response()->json(['error' => "Error while creating user."], 400);
-        }
+        $data = $request->all();
+        \Log::info("🔍 Data received for registration:", $data);
+
+        $this->validate($request, [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => app('hash')->make($data['password']),
+        ]);
+
+        \Log::info("✅ User created successfully: ", $user->toArray());
+
+        return response()->json($user, 201);
     }
 
     public function login(Request $request)
