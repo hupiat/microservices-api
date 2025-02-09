@@ -114,6 +114,11 @@ jobs:
           echo "LUMEN_API_URL=http://127.0.0.1:8000" >> $GITHUB_ENV
           echo "APP_ENV=ci" >> $GITHUB_ENV
 
+      - name: Generate JWT Secret
+        run: |
+          cd backend/lumen-api
+          php artisan jwt:secret
+
       - name: Start Lumen as a service
         run: |
           cd backend/lumen-api
