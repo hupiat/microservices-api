@@ -136,7 +136,7 @@ jobs:
       - name: Start Lumen as a service
         run: |
           cd backend/lumen-api
-          php -S localhost:8000 -t public
+          nohup php -S 127.0.0.1:8000 -t public > lumen.log 2>&1 &
 
       - name: Wait for Lumen API
         run: |
