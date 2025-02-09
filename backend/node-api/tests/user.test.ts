@@ -7,17 +7,17 @@ describe("User API", () => {
   test("should register a user", async () => {
     const res = await request(app).post("/api/users").send({
       name: "Test User",
-      email: "test@example.com",
+      email: "test@example.fr",
       password: "Password123",
     });
     console.log(res.body);
     expect(res.statusCode).toBe(201);
-    expect(res.body.email).toBe("test@example.com");
+    expect(res.body.email).toBe("test@example.fr");
   });
 
   test("should login a user", async () => {
     const res = await request(app).post("/api/users/login").send({
-      email: "test@example.com",
+      email: "test@example.fr",
       password: "Password123",
     });
     expect(res.statusCode).toBe(200);
