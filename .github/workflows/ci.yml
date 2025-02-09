@@ -64,19 +64,7 @@ jobs:
           php artisan migrate
           php artisan db:seed
 
-      - name: Afficher les logs de Lumen
-        run: |
-          echo "---- Lumen Error Log ----"
-          cat backend/lumen-api/storage/logs/lumen.log || echo "Aucun log trouvé"
-
       - name: Run Lumen tests
         run: |
           cd backend/lumen-api
-          vendor/bin/phpunit
-
-      - name: Debug Login Request
-        if: always()
-        run: |
-          curl -X POST http://127.0.0.1:8000/login \
-              -H "Content-Type: application/json" \
-              -d '{"email": "test@example.com", "password": "Password123"}' || echo "Login request failed"
+          composer test
