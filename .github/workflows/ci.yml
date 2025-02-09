@@ -61,7 +61,8 @@ jobs:
         run: |
           cd backend/lumen-api
           chmod +x artisan
-          php artisan migrate --env=testing --force
+          php artisan migrate
+          php artisan db:seed
 
       - name: Afficher les logs de Lumen
         run: |
