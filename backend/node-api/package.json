@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx jest",
+    "test": "npx jest --forceExit",
     "test:watch": "npx jest --watch",
     "test:coverage": "npx jest --coverage"
   },
