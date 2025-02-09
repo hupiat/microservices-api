@@ -91,6 +91,13 @@ jobs:
         with:
           node-version: 18
 
+      - name: Setup PHP & Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: pdo, pdo_mysql
+          tools: composer
+
       - name: Install dependencies
         run: |
           cd backend/node-api
