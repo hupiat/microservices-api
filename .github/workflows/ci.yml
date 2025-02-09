@@ -136,7 +136,7 @@ jobs:
       - name: Start Lumen as a service
         run: |
           cd backend/lumen-api
-          docker run -d --name lumen-api -p 8000:8000 --network host -v $(pwd):/app -w /app php:8.2-cli php -S 0.0.0.0:8000 -t public
+          php -S localhost:8000 -t public
 
       - name: Wait for Lumen API
         run: |
