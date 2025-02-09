@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 const redis = new Redis();
-const LUMEN_API_URL = process.env.LUMEN_API_URL || "http://127.0.0.1:8000";
+const LUMEN_API_URL = process.env.LUMEN_API_URL || "http://localhost:8000";
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
 // POST - Login
