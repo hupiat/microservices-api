@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  backend-tests:
+  lumen-tests:
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -127,9 +127,6 @@ jobs:
           echo "❌ Lumen API did not start in time."
           docker logs lumen-api
           exit 1
-
-      - name: Configure LUMEN_API_URL
-        run: echo "LUMEN_API_URL=http://127.0.0.1:8000" >> backend/node-api/.env
 
       - name: Run Node.js tests
         run: |
