@@ -114,6 +114,20 @@ jobs:
           echo "LUMEN_API_URL=http://127.0.0.1:8000" >> $GITHUB_ENV
           echo "APP_ENV=ci" >> $GITHUB_ENV
 
+      - name: Setup PHP & Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: pdo, pdo_mysql
+          tools: composer
+
+      - name: Install Lumen dependencies
+        run: |
+          cd backend/lumen-api
+          composer install
+          cp .env.example .env
+          php artisan cache:clear
+
       - name: Generate JWT Secret
         run: |
           cd backend/lumen-api
