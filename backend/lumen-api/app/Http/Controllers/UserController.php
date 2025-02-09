@@ -14,28 +14,24 @@ class UserController extends BaseController
 {
     public function register(Request $request)
     {
-        try {
-            $data = $request->all();
-            \Log::info("🔍 Data received for registration:", $data);
+        $data = $request->all();
+        \Log::info("🔍 Data received for registration:", $data);
 
-            $this->validate($request, [
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:6',
-            ]);
+        $this->validate($request, [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:6',
+        ]);
 
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => app('hash')->make($data['password']),
-            ]);
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => app('hash')->make($data['password']),
+        ]);
 
-            \Log::info("✅ User created successfully: ", $user->toArray());
+        \Log::info("✅ User created successfully: ", $user->toArray());
 
-            return response()->json($user, 201);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
-        }
+        return response()->json($user, 201);
     }
 
     public function login(Request $request)
