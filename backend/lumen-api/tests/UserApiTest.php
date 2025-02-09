@@ -44,6 +44,8 @@ class UserApiTest extends TestCase
             'password' => 'Password123'
         ]);
 
+        fwrite(STDERR, "\n[DEBUG] Register Response:\n" . $response->response->getContent());
+
         $response->seeStatusCode(200)
                  ->seeJsonStructure(['token']);
 
