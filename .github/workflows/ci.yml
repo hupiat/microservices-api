@@ -69,11 +69,6 @@ jobs:
           cd backend/lumen-api
           php artisan jwt:secret
 
-      - name: Start Lumen API in the background
-        run: |
-          cd backend/lumen-api
-          nohup php -S 0.0.0.0:8000 -t public > lumen.log 2>&1 &
-
       - name: Run Lumen tests
         run: |
           cd backend/lumen-api
@@ -132,6 +127,9 @@ jobs:
           echo "❌ Lumen API did not start in time."
           docker logs lumen-api
           exit 1
+
+      - name: Configure LUMEN_API_URL
+        run: echo "LUMEN_API_URL=http://127.0.0.1:8000" >> backend/node-api/.env
 
       - name: Run Node.js tests
         run: |
