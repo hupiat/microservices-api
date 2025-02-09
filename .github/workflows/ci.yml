@@ -72,7 +72,22 @@ jobs:
       - name: Start Lumen API in the background
         run: |
           cd backend/lumen-api
-          php -S 0.0.0.0:8000 -t public &
+          nohup php -S 0.0.0.0:8000 -t public > lumen.log 2>&1 &
+
+      - name: Wait for Lumen API
+        run: |
+          for i in {1..15}; do
+            if curl -sSf http://127.0.0.1:8000 > /dev/null; then
+              echo "✅ Lumen API is running!"
+              exit 0
+            fi
+            echo "⏳ Waiting for Lumen API..."
+            sleep 3
+          done
+          echo "❌ Lumen API did not start in time."
+          echo "---- Lumen Logs ----"
+          cat backend/lumen-api/lumen.log
+          exit 1
 
       - name: Run Lumen tests
         run: |
@@ -116,7 +131,7 @@ jobs:
 
       - name: Wait for Lumen API
         run: |
-          for i in {1..10}; do
+          for i in {1..15}; do
             if curl -sSf http://127.0.0.1:8000 > /dev/null; then
               echo "✅ Lumen API is running!"
               exit 0
