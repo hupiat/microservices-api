@@ -179,7 +179,7 @@ app.post("/api/users", async (req: Request, res: Response) => {
       },
     });
     await redis.del("users");
-
+    console.log(response.body);
     res.status(201).json(await response.json());
   } catch (error) {
     console.error("Error while creating user", error);
