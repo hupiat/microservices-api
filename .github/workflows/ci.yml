@@ -76,7 +76,7 @@ jobs:
 
   node-tests:
     runs-on: ubuntu-latest
-    needs: backend-tests
+    needs: lumen-tests
     services:
       redis:
         image: redis:latest
