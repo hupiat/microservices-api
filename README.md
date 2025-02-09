@@ -22,6 +22,7 @@ cd microservices-api
 
 ```sh
 npm install
+composer install
 ```
 
 ### 4️⃣ Environment Configuration
